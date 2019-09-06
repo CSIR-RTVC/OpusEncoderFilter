@@ -1,7 +1,5 @@
 #pragma once
-
 #include <DirectShowExt/FilterPropertiesBase.h>
-#include "Conversion.h"
 #include <cassert>
 #include <climits>
 #include "resource.h"
@@ -86,7 +84,7 @@ public:
       int iCheck = SendMessage(GetDlgItem(m_Dlg, nRadioID), (UINT)BM_GETCHECK, 0, 0);
       if (iCheck != 0)
       {
-        std::string sID = artist::toString(i);
+        std::string sID = std::to_string(i);
         HRESULT hr = m_pSettingsInterface->SetParameter(CODEC_PARAM_OPUS_APPLICATION, sID.c_str());
         break;
       }

@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OpusEncoderFilter.h"
 
 //Codec classes
-#include <Codecs/Opus/OpusFactory.h>
+#include <OpusCodec/OpusFactory.h>
 #include <CodecUtils/ICodecv2.h>
-#include "Conversion.h"
+// #include "Conversion.h"
 #include <Mmreg.h>
 
 OpusEncoderFilter::OpusEncoderFilter()
@@ -147,10 +147,10 @@ HRESULT OpusEncoderFilter::SetMediaType( PIN_DIRECTION direction, const CMediaTy
     m_uiBitsPerSample = pWfx->wBitsPerSample;
     m_pAudioBuffer = std::make_unique<AudioBuffer>(m_uiSamplesPerSecond, m_uiChannels, m_uiBitsPerSample);
 
-    m_pCodec->SetParameter("samples_per_second", artist::toString(m_uiSamplesPerSecond).c_str());
-    m_pCodec->SetParameter("channels", artist::toString(m_uiChannels).c_str());
-    m_pCodec->SetParameter("bits_per_sample", artist::toString(m_uiBitsPerSample).c_str());
-    m_pCodec->SetParameter("target_bitrate_kbps", artist::toString(m_uiTargetBitrateKbps).c_str());
+    m_pCodec->SetParameter("samples_per_second", std::to_string(m_uiSamplesPerSecond).c_str());
+    m_pCodec->SetParameter("channels", std::to_string(m_uiChannels).c_str());
+    m_pCodec->SetParameter("bits_per_sample", std::to_string(m_uiBitsPerSample).c_str());
+    m_pCodec->SetParameter("target_bitrate_kbps", std::to_string(m_uiTargetBitrateKbps).c_str());
 
     if (!m_pCodec->Open())
     {
@@ -236,7 +236,7 @@ HRESULT OpusEncoderFilter::DecideBufferSize( IMemAllocator *pAlloc, ALLOCATOR_PR
   pProp->cBuffers = 5;
   pProp->cbBuffer = pwfx->nSamplesPerSec * pwfx->wBitsPerSample * pwfx->nChannels / 8;
   // configure max compressed size
-  m_pCodec->SetParameter("max_compr_size", artist::toString(pProp->cbBuffer).c_str());
+  m_pCodec->SetParameter("max_compr_size", std::to_string(pProp->cbBuffer).c_str());
 
   pProp->cbAlign = pwfx->nBlockAlign;
   ASSERT(pProp->cbBuffer);
@@ -351,7 +351,7 @@ HRESULT OpusEncoderFilter::Receive(IMediaSample *pSample)
     pDest->GetPointer(&pDestBuffer);
 
     //////////////////////
-    m_pCodec->SetParameter("max_compr_size", artist::toString(lDestSize).c_str());
+    m_pCodec->SetParameter("max_compr_size", std::to_string(lDestSize).c_str());
     int nResult = m_pCodec->Code(pStartOfSample, pDestBuffer, m_pAudioBuffer->getBytesPerFrame());
     if (nResult)
     {

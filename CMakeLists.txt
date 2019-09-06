@@ -1,16 +1,29 @@
 # CMakeLists.txt for <OpusEncoderFilter> 
+cmake_minimum_required(VERSION 3.0)
 
-INCLUDE_DIRECTORIES(
-${artistIncludes}
-${artistDirectShowIncludes}
-${artistCodecIncludes}
-${artistUtilIncludes}
+# hints from https://github.com/robotology/how-to-export-cpp-library/blob/master/CMakeLists.txt
+project(OpusEncoderFilter
+        LANGUAGES CXX C
+        VERSION 0.0.0.0)
+
+SET (DSE_INCLUDE_DIRS 
+	${PROJECT_SOURCE_DIR}/include/
+	${PROJECT_SOURCE_DIR}/externals/DirectShowExt/include
+	${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/baseclasses
+	${PROJECT_SOURCE_DIR}/externals/Opus/include
+	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include
+	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include/CodecUtils
 )
- 
-# Lib directories
-LINK_DIRECTORIES(
-${vppLink}
-)
+
+LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/build)
+LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/build/src)
+LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DirectShowExt/build/src)
+LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/externals/vcpkg/packages/opus_x86-windows/share/opus)
+find_package(OpusCodec REQUIRED)
+find_package(BaseClasses REQUIRED)
+find_package(DirectShowExt REQUIRED)
+find_package(Opus REQUIRED)
+
 
 SET(FLT_HDRS
 AudioBuffer.h
@@ -29,13 +42,24 @@ OpusEncoderFilter.rc
 stdafx.cpp
 )
 
+
 ADD_LIBRARY(
 OpusEncoderFilter SHARED ${FLT_SRCS} ${FLT_HDRS})
 
+target_include_directories(OpusEncoderFilter
+    PUBLIC 
+        $<INSTALL_INTERFACE:>    
+        $<BUILD_INTERFACE:>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+		${DSE_INCLUDE_DIRS}
+)
+
 TARGET_LINK_LIBRARIES (
 OpusEncoderFilter
-OpusCodec
-${DsFilterLibs}
+DirectShowExt::DirectShowExt
+OpusCodec::OpusCodec
+BaseClasses::BaseClasses
 ) 
 
 INSTALL(
