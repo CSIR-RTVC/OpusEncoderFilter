@@ -55,11 +55,18 @@ target_include_directories(OpusEncoderFilter
 		${DSE_INCLUDE_DIRS}
 )
 
+LINK_DIRECTORIES(
+    $ENV{MSSDK}/Lib
+)
+
 TARGET_LINK_LIBRARIES (
-OpusEncoderFilter
-DirectShowExt::DirectShowExt
-OpusCodec::OpusCodec
-BaseClasses::BaseClasses
+    OpusEncoderFilter
+    BaseClasses::BaseClasses
+    DirectShowExt::DirectShowExt
+    OpusCodec::OpusCodec
+	strmiids
+	winmm
+	comctl32
 ) 
 
 INSTALL(
