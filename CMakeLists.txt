@@ -1,28 +1,48 @@
 # CMakeLists.txt for <OpusEncoderFilter> 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
 
 # hints from https://github.com/robotology/how-to-export-cpp-library/blob/master/CMakeLists.txt
 project(OpusEncoderFilter
         LANGUAGES CXX C
         VERSION 0.0.0.0)
 
-SET (DSE_INCLUDE_DIRS 
-	${PROJECT_SOURCE_DIR}/include/
-	${PROJECT_SOURCE_DIR}/externals/DirectShowExt/include
-	${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/baseclasses
-	${PROJECT_SOURCE_DIR}/externals/Opus/include
-	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include
-	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include/CodecUtils
-)
+#Make sure that custom modules like FindRapidJSON are found
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
-LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/build)
-LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/build/src)
-LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DirectShowExt/build/src)
-LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/externals/vcpkg/packages/opus_x86-windows/share/opus)
-find_package(OpusCodec REQUIRED)
-find_package(BaseClasses REQUIRED)
-find_package(DirectShowExt REQUIRED)
-find_package(Opus REQUIRED)
+LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/vcpkg/packages/opus_x86-windows/share/opus)
+##############################################
+include(FetchContent)
+FetchContent_Declare(
+  Vpp
+  GIT_REPOSITORY https://github.com/CSIR-RTVC/OpusCodec
+)
+# Declare dependencies
+find_package(OpusCodec 1.0.0 REQUIRED)
+
+FetchContent_Declare(
+  DirectShowExt
+  GIT_REPOSITORY https://github.com/CSIR-RTVC/DirectShowExt
+)
+# Declare dependencies
+find_package(DirectShowExt 1.0.0 REQUIRED)
+
+#SET (DSE_INCLUDE_DIRS 
+#	${PROJECT_SOURCE_DIR}/include/
+#	${PROJECT_SOURCE_DIR}/externals/DirectShowExt/include
+#	${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/baseclasses
+#	${PROJECT_SOURCE_DIR}/externals/Opus/include
+#	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include
+#	${PROJECT_SOURCE_DIR}/externals/Opus/externals/CodecUtils/include/CodecUtils
+#)
+
+#LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DShowBaseClasses/build)
+#LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/build/src)
+#LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/DirectShowExt/build/src)
+#LIST(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals/Opus/externals/vcpkg/packages/opus_x86-windows/share/opus)
+#find_package(OpusCodec REQUIRED)
+#find_package(BaseClasses REQUIRED)
+#find_package(DirectShowExt REQUIRED)
+#find_package(Opus REQUIRED)
 
 
 SET(FLT_HDRS
@@ -42,17 +62,15 @@ OpusEncoderFilter.rc
 stdafx.cpp
 )
 
-
 ADD_LIBRARY(
 OpusEncoderFilter SHARED ${FLT_SRCS} ${FLT_HDRS})
 
 target_include_directories(OpusEncoderFilter
     PUBLIC 
-        $<INSTALL_INTERFACE:>    
-        $<BUILD_INTERFACE:>
+        $<INSTALL_INTERFACE:install>    
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-		${DSE_INCLUDE_DIRS}
 )
 
 LINK_DIRECTORIES(
@@ -61,11 +79,11 @@ LINK_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES (
     OpusEncoderFilter
-    BaseClasses::BaseClasses
-    DirectShowExt::DirectShowExt
+#    BaseClasses::BaseClasses
     OpusCodec::OpusCodec
+    DirectShowExt::DirectShowExt
 	strmiids
-	winmm
+#	winmm
 	comctl32
 ) 
 
