@@ -1,9 +1,0 @@
-[submodule "externals/Opus"]
-	path = externals/Opus
-	url = https://github.com/CSIR-RTVC/Opus
-[submodule "externals/DirectShowExt"]
-	path = externals/DirectShowExt
-	url = https://github.com/CSIR-RTVC/DirectShowExt
-[submodule "externals/DShowBaseClasses"]
-	path = externals/DShowBaseClasses
-	url = https://github.com/CSIR-RTVC/DShowBaseClasses
